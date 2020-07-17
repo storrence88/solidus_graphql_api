@@ -19,7 +19,6 @@ module SolidusGraphqlApi
 
       def self.decode(value)
         class_name, item_id = decode_if_relay_id(value)
-
         return value unless class_exists?(class_name)
 
         to_i_or_nil(item_id) || value
@@ -39,7 +38,8 @@ module SolidusGraphqlApi
 
       def self.decode_if_relay_id(value)
         GraphQL::Schema::UniqueWithinType.decode(value)
-      rescue ArgumentError
+      rescue ArgumentError => e
+        puts ".decode_if_relay_id - #{e.message} - #{value}"
         [nil, nil]
       end
 
@@ -47,7 +47,8 @@ module SolidusGraphqlApi
         return false if value.nil?
 
         Object.const_defined?(value)
-      rescue NameError
+      rescue NameError => e
+        puts ".class_exists? - #{e.message} - #{value}"
         false
       end
 
@@ -55,7 +56,8 @@ module SolidusGraphqlApi
         return value if value.nil?
 
         Integer(value)
-      rescue ArgumentError
+      rescue ArgumentError => e
+        puts ".to_i_or_nil - #{e.message} - #{value}"
         nil
       end
     end
